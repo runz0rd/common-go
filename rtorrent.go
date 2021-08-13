@@ -20,16 +20,28 @@ func NewRtorrentClient(address string) (*RtorrentClient, error) {
 	return &RtorrentClient{c}, nil
 }
 
-func (rc *RtorrentClient) Download(path, destination string) error {
+func (tm *RtorrentClient) AddFromFile(path, destination string) error {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
+	return tm.addContent(content, path, destination)
+}
+
+func (tm *RtorrentClient) AddFromUrl(url, destination string) error {
+	url, content, err := GetUrlContent(url)
+	if err != nil {
+		return err
+	}
+	return tm.addContent(content, url, destination)
+}
+
+func (tm *RtorrentClient) addContent(content []byte, path, destination string) error {
 	if filepath.Ext(path) == ".magnet" {
-		return rc.addMagnet(content, destination)
+		return tm.addMagnet(content, destination)
 	}
 	if filepath.Ext(path) == ".torrent" {
-		return rc.addTorrent(content, destination)
+		return tm.addTorrent(content, destination)
 	}
 	return fmt.Errorf("Extension must be torrent or magnet, %q given", filepath.Ext(path))
 }

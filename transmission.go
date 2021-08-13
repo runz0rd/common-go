@@ -27,11 +27,23 @@ func NewTransmissionClient(address, user, pass string) (*TransmissionClient, err
 	return &TransmissionClient{tc}, nil
 }
 
-func (tm *TransmissionClient) Download(path, destination string) error {
+func (tm *TransmissionClient) AddFromFile(path, destination string) error {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
+	return tm.addContent(content, path, destination)
+}
+
+func (tm *TransmissionClient) AddFromUrl(url, destination string) error {
+	url, content, err := GetUrlContent(url)
+	if err != nil {
+		return err
+	}
+	return tm.addContent(content, url, destination)
+}
+
+func (tm *TransmissionClient) addContent(content []byte, path, destination string) error {
 	if filepath.Ext(path) == ".magnet" {
 		return tm.addMagnet(content, destination)
 	}

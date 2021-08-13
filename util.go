@@ -2,9 +2,12 @@ package common
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 func ByteCountSI(b int64) string {
@@ -50,4 +53,39 @@ func ListDir(dir string, exts []string) ([]string, error) {
 		files = append(files, path.Join(dir, file.Name()))
 	}
 	return files, nil
+}
+
+type StackTracable interface {
+	StackTrace() errors.StackTrace
+}
+
+type Printable interface {
+	Printf(format string, v ...interface{})
+}
+
+func PrintStackTrace(err StackTracable, p Printable) {
+	if err, ok := err.(StackTracable); ok {
+		for _, f := range err.StackTrace() {
+			p.Printf("%+s:%d\n", f, f)
+		}
+	}
+}
+
+func GetUrlContent(url string) (realUrl string, content []byte, err error) {
+	client := http.Client{
+		CheckRedirect: func(r *http.Request, via []*http.Request) error {
+			r.URL.Opaque = r.URL.Path
+			return nil
+		},
+	}
+	resp, err := client.Get(url)
+	if err != nil {
+		return "", nil, errors.WithStack(err)
+	}
+	defer resp.Body.Close()
+
+	if _, err := resp.Body.Read(content); err != nil {
+		return "", nil, errors.WithStack(err)
+	}
+	return resp.Request.URL.Path, content, nil
 }

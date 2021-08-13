@@ -3,9 +3,12 @@ package common
 import "fmt"
 
 type TorrentClient interface {
-	// path: filepath to .torrent or a .magnet file
+	// filepath: .torrent or a .magnet file
 	// destination: path to dir where to download
-	Download(filepath, destination string) error
+	AddFromFile(filepath, destination string) error
+
+	// url: points to contents of torrent or magnet file
+	AddFromUrl(url, destination string) error
 }
 
 type TorrentClientConfig struct {
