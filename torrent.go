@@ -9,6 +9,9 @@ type TorrentClient interface {
 
 	// url: points to contents of torrent or magnet file
 	AddFromUrl(url, destination string) error
+
+	// type_: magnet or torrent
+	AddContent(content []byte, type_ string, destination string) error
 }
 
 type TorrentClientConfig struct {

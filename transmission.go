@@ -43,6 +43,10 @@ func (tm *TransmissionClient) AddFromUrl(url, destination string) error {
 	return tm.addContent(content, url, destination)
 }
 
+func (tm *TransmissionClient) AddContent(content []byte, type_ string, destination string) error {
+	return tm.addContent(content, fmt.Sprintf(".%v", type_), destination)
+}
+
 func (tm *TransmissionClient) addContent(content []byte, path, destination string) error {
 	if filepath.Ext(path) == ".magnet" {
 		return tm.addMagnet(content, destination)
@@ -50,7 +54,7 @@ func (tm *TransmissionClient) addContent(content []byte, path, destination strin
 	if filepath.Ext(path) == ".torrent" {
 		return tm.addTorrent(content, destination)
 	}
-	return fmt.Errorf("Extension must be torrent or magnet, %q given", filepath.Ext(path))
+	return fmt.Errorf("must be torrent or magnet, %q given", filepath.Ext(path))
 }
 
 func (tm *TransmissionClient) addMagnet(content []byte, destination string) error {
