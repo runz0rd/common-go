@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -84,7 +85,8 @@ func GetUrlContent(url string) (realUrl string, content []byte, err error) {
 	}
 	defer resp.Body.Close()
 
-	if _, err := resp.Body.Read(content); err != nil {
+	content, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return "", nil, errors.WithStack(err)
 	}
 	return resp.Request.URL.Path, content, nil
