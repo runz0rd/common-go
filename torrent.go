@@ -11,7 +11,7 @@ type TorrentClient interface {
 	AddFromUrl(url, destination string) error
 
 	// type_: magnet or torrent
-	AddContent(content []byte, type_ string, destination string) error
+	AddContent(content []byte, destination string) error
 }
 
 type TorrentClientConfig struct {

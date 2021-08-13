@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/odwrtw/transmission"
 )
@@ -43,8 +44,12 @@ func (tm *TransmissionClient) AddFromUrl(url, destination string) error {
 	return tm.addContent(content, url, destination)
 }
 
-func (tm *TransmissionClient) AddContent(content []byte, type_ string, destination string) error {
-	return tm.addContent(content, fmt.Sprintf(".%v", type_), destination)
+func (tm *TransmissionClient) AddContent(content []byte, destination string) error {
+	t := ".torrent"
+	if strings.HasPrefix(string(content), "magnet:") {
+		t = ".magnet"
+	}
+	return tm.addContent(content, fmt.Sprintf(".%v", t), destination)
 }
 
 func (tm *TransmissionClient) addContent(content []byte, path, destination string) error {
