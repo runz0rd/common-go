@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
@@ -36,8 +37,12 @@ func (rc *RtorrentClient) AddFromUrl(url, destination string) error {
 	return rc.addContent(content, url, destination)
 }
 
-func (rc *RtorrentClient) AddContent(content []byte, type_ string, destination string) error {
-	return rc.addContent(content, fmt.Sprintf(".%v", type_), destination)
+func (rc *RtorrentClient) AddContent(content []byte, destination string) error {
+	t := ".torrent"
+	if strings.HasPrefix(string(content), "magnet:") {
+		t = ".magnet"
+	}
+	return rc.addContent(content, fmt.Sprintf(".%v", t), destination)
 }
 
 func (rc *RtorrentClient) addContent(content []byte, path, destination string) error {
