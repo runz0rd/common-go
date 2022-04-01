@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 func ByteCountSI(b int64) string {
@@ -90,4 +91,12 @@ func GetUrlContent(url string) (realUrl string, content []byte, err error) {
 		return "", nil, errors.WithStack(err)
 	}
 	return resp.Request.URL.Path, content, nil
+}
+
+func LoadYaml(path string, data interface{}) error {
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	return yaml.Unmarshal(bs, data)
 }
