@@ -73,24 +73,22 @@ func PrintStackTrace(err StackTracable, p Printable) {
 	}
 }
 
-func GetUrlContent(url string) (realUrl string, content []byte, err error) {
-	client := http.Client{
-		CheckRedirect: func(r *http.Request, via []*http.Request) error {
-			r.URL.Opaque = r.URL.Path
-			return nil
-		},
-	}
-	resp, err := client.Get(url)
+func GetUrlContent(url string) (actualUrl string, content []byte, err error) {
+	resp, err := http.Get(url)
 	if err != nil {
 		return "", nil, errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return "", nil, fmt.Errorf("%v returned status code %q", url, resp.StatusCode)
+	}
+
 	content, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", nil, errors.WithStack(err)
 	}
-	return resp.Request.URL.Path, content, nil
+	return resp.Request.URL.String(), content, nil
 }
 
 func LoadYaml(path string, data interface{}) error {
